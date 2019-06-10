@@ -1,4 +1,8 @@
-function [street, streetColorArray, destination] = timeStepMovementRoundabout(cellsNumber, street, streetColorArray, timeStep, priority, destination)
+function [street, streetColorArray, destination, southStreetOut, eastStreetOut, westStreetOut, northStreetOut, startSouthOut, startNorthOut, startWestOut, startEastOut, southStreetColorArrayOut, westStreetColorArrayOut, eastStreetColorArrayOut, northStreetColorArrayOut] = timeStepMovementRoundabout(cellsNumber, street, streetColorArray, timeStep, priority, destination, southStreetOut, eastStreetOut, westStreetOut, northStreetOut, southStreetColorArrayOut, westStreetColorArrayOut, eastStreetColorArrayOut, northStreetColorArrayOut)
+    startSouthOut = 1;
+    startWestOut = 1;
+    startNorthOut = 1;
+    startEastOut = 1;
     for cell=1:cellsNumber
         %if the cell contains a car
         if street(timeStep-1, cell) ~= -1
@@ -6,6 +10,23 @@ function [street, streetColorArray, destination] = timeStepMovementRoundabout(ce
                 street(timeStep, cell) = -1;
                 destination(timeStep, cell) = -1;
                 streetColorArray(timeStep, cell) = '';
+                if cell == 2
+                	southStreetOut(timeStep,1) = 1;
+                    startSouthOut = 2;
+                    southStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                elseif cell == 5
+                    eastStreetOut(timeStep,1) = 1;
+                    startEastOut = 2;
+                    eastStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                elseif cell == 8
+                    northStreetOut(timeStep,1) = 1;
+                    startNorthOut = 2;
+                    northStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                elseif cell == 11
+                    westStreetOut(timeStep,1) = 1;
+                    startWestOut = 2;
+                    westStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                end                
                 continue;
             end
             % maximal distance that results from previous velocity
