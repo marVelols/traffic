@@ -69,12 +69,12 @@ crossStreetColorArray = strings([timeStepsNumber, crossStreetCellsNumber]);
 for timeStep=2:timeStepsNumber
     
     [startPriority, priorityStreet, priorityStreetColorArray, colorIndex] = ...
-        generateCar(priorityStreet, timeStep, priorityStreetColorArray, colorIndex, colorsArray);
+        generateCar(priorityStreet, timeStep, priorityStreetColorArray, colorIndex, colorsArray, 0.5);
     [priorityStreet, priorityStreetColorArray] = timeStepMovement(startPriority, priorityStreetCellsNumber, priorityStreet,...
         priorityStreetColorArray, timeStep, maxVelocity, 1)
     
     [startCross, crossStreet, crossStreetColorArray, colorIndex] = ...
-        generateCar(crossStreet, timeStep, crossStreetColorArray, colorIndex, colorsArray);
+        generateCar(crossStreet, timeStep, crossStreetColorArray, colorIndex, colorsArray, 0.5);
     [crossStreet, crossStreetColorArray] = timeStepMovement(startCross, crossStreetCellsNumber, crossStreet,...
         crossStreetColorArray, timeStep, maxVelocity, 0)
     
@@ -92,46 +92,64 @@ priorityStreet
 priorityStreetColorArray
 canGoArray
 
-figure
-for i=1:timeStepsNumber
-    subplot(5, timeStepsNumber/5, i)
-    grid on
-    axis([1 priorityStreetCellsNumber 0 5])
-    for j=1:priorityStreetCellsNumber
-        if priorityStreet(i, j) ~= -1
-            style = [priorityStreetColorArray(i, j) "."];
-            style = join(style);
-            plot(j, priorityStreet(i, j), style, 'MarkerSize', 30)
-            xlabel("Cell")
-            ylabel("Speed")
-            title(num2str(i))
-            grid on
-            hold on
-            axis([1 priorityStreetCellsNumber 0 5])
-        end
-    end
-    drawnow
-end
+% figure
+% for i=1:timeStepsNumber
+%     subplot(5, timeStepsNumber/5, i)
+%     grid on
+%     axis([1 priorityStreetCellsNumber 0 5])
+%     for j=1:priorityStreetCellsNumber
+%         if priorityStreet(i, j) ~= -1
+%             style = [priorityStreetColorArray(i, j) "."];
+%             style = join(style);
+%             plot(j, priorityStreet(i, j), style, 'MarkerSize', 30)
+%             xlabel("Cell")
+%             ylabel("Speed")
+%             title(num2str(i))
+%             grid on
+%             hold on
+%             axis([1 priorityStreetCellsNumber 0 5])
+%         end
+%     end
+%     drawnow
+% end
+% 
+% figure
+% for i=1:timeStepsNumber
+%     subplot(5, timeStepsNumber/5, i)
+%     grid on
+%     axis([0 5 1 crossStreetCellsNumber])
+%     for j=1:crossStreetCellsNumber
+%         if crossStreet(i, j) ~= -1
+%             style = [crossStreetColorArray(i, j) "."];
+%             style = join(style);
+%             plot(crossStreet(i, j), j, style, 'MarkerSize', 30)
+%             xlabel("Speed")
+%             ylabel("Cell")
+%             title(num2str(i))
+%             grid on
+%             hold on
+%             axis([0 5 1 crossStreetCellsNumber])
+%         end
+%     end
+%     drawnow
+% end
 
 figure
 for i=1:timeStepsNumber
-    subplot(5, timeStepsNumber/5, i)
+    figure
     grid on
-    axis([0 5 1 crossStreetCellsNumber])
-    for j=1:crossStreetCellsNumber
-        if crossStreet(i, j) ~= -1
-            style = [crossStreetColorArray(i, j) "."];
-            style = join(style);
-            plot(crossStreet(i, j), j, style, 'MarkerSize', 30)
-            xlabel("Speed")
-            ylabel("Cell")
-            title(num2str(i))
-            grid on
-            hold on
-            axis([0 5 1 crossStreetCellsNumber])
-        end
-    end
+    axis([-2 21 -10 3])
+    plot(0:20, zeros(1,21), 'k')
+    hold on
+    plot(10*ones(1,11), -10:0, 'k')
+    leftPriorityVector = 0:priorityStreetCrossCell;
+    rightPriorityVector = priorityStreetCrossCell:priorityStreetCellsNumber;
+    crossVector = -flip(0:crossStreetCellsNumber);
+    showStreet(priorityStreetCellsNumber, priorityStreet, priorityStreetColorArray, leftPriorityVector, zeros(1, (priorityStreetCellsNumber-1)/2), i);
+    showStreet(priorityStreetCellsNumber, priorityStreet, priorityStreetColorArray, rightPriorityVector, zeros(1, (priorityStreetCellsNumber-1)/2), i);
+    showStreet(crossStreetCellsNumber, crossStreet, crossStreetColorArray, 10*ones(1, crossStreetCellsNumber), crossVector,  i);
     drawnow
+    pause(0.5)
 end
 %%
 % Model based on Nagel Schreckenberg model
@@ -141,10 +159,10 @@ clc
 clear all
 close all
 
-timeStepsNumber = 50;
+timeStepsNumber = 240;
 inputStreetCellsNumber = 20;
 roundaboutCellsNumber = 12;
-probability = [0.8*ones(1,5) 0.4*ones(1,10) 0.5*ones(1,5) 0.8*ones(1,5) 0.4*ones(1,5) 0.2*ones(1,20)];
+probability = [0.1*ones(1,timeStepsNumber.*5./24), 0.2*ones(1,timeStepsNumber.*2./24), 0.8*ones(1,timeStepsNumber.*1./24), 0.2*ones(1,timeStepsNumber.*2./24), 0.1*ones(1,timeStepsNumber.*3./24), 0.4*ones(1,timeStepsNumber.*3./24), 0.8*ones(1,timeStepsNumber.*1./24), 0.4*ones(1,timeStepsNumber.*3./24), 0.2*ones(1,timeStepsNumber.*4./24)];
 westStreet = -ones(timeStepsNumber, inputStreetCellsNumber);
 northStreet = -ones(timeStepsNumber, inputStreetCellsNumber);
 eastStreet = -ones(timeStepsNumber, inputStreetCellsNumber);
@@ -185,7 +203,7 @@ for timeStep=2:timeStepsNumber
         generateCar(eastStreet, timeStep, eastStreetColorArray, colorIndex, colorsArray, probability(timeStep));
     % south car
     [startSouth, southStreet, southStreetColorArray, colorIndex] = ...
-        generateCar(southStreet, timeStep, southStreetColorArray, colorIndex, colorsArray, probability(timeStep));
+        generateCar(southStreet, timeStep, southStreetColorArray, colorIndex, colorsArray, probability(timeStep)./2);
     
     % move cars
     % west street
@@ -206,28 +224,24 @@ for timeStep=2:timeStepsNumber
         southStreetOut, eastStreetOut, westStreetOut, northStreetOut, southStreetColorArrayOut, westStreetColorArrayOut, eastStreetColorArrayOut, northStreetColorArrayOut);
 
     canGo = checkIfCarCanJoinRoundabout(timeStep, westStreet, roundabout, roundaboutOuputCells(1));
-    %canGoArray = [canGoArray canGo];
     if canGo == 1
         [westStreet, roundabout, roundaboutDestination, roundaboutColorArray] = ...
             carJoinment(westStreet,roundabout,timeStep,roundaboutCrossCells(1),roundaboutOuputCells, roundaboutDestination, roundaboutColorArray, westStreetColorArray);
     end
     
     canGo = checkIfCarCanJoinRoundabout(timeStep, southStreet, roundabout, roundaboutOuputCells(2));
-    %canGoArray = [canGoArray canGo];
     if canGo == 1
         [southStreet, roundabout, roundaboutDestination, roundaboutColorArray] = ...
             carJoinment(southStreet,roundabout,timeStep,roundaboutCrossCells(2),roundaboutOuputCells, roundaboutDestination, roundaboutColorArray, southStreetColorArray);
     end
     
     canGo = checkIfCarCanJoinRoundabout(timeStep, eastStreet, roundabout, roundaboutOuputCells(3));
-    %canGoArray = [canGoArray canGo];
     if canGo == 1
         [eastStreet, roundabout, roundaboutDestination, roundaboutColorArray] = ...
             carJoinment(eastStreet,roundabout,timeStep,roundaboutCrossCells(3),roundaboutOuputCells, roundaboutDestination, roundaboutColorArray, eastStreetColorArray);
     end
     
     canGo = checkIfCarCanJoinRoundabout(timeStep, northStreet, roundabout, roundaboutOuputCells(4));
-    %canGoArray = [canGoArray canGo];
     if canGo == 1
         [northStreet, roundabout, roundaboutDestination, roundaboutColorArray] = ...
             carJoinment(northStreet,roundabout,timeStep,roundaboutCrossCells(4),roundaboutOuputCells, roundaboutDestination, roundaboutColorArray, northStreetColorArray);
@@ -248,17 +262,68 @@ for timeStep=2:timeStepsNumber
         southStreetColorArrayOut, timeStep, maxVelocityStreet, 1);
 end
 
-westStreet
-northStreet
-eastStreet
-southStreet
-canGoArray
-roundabout
-roundaboutDestination
-westStreetOut
-northStreetOut
-eastStreetOut
-southStreetOut
+for i=1:timeStepsNumber
+    figure
+    grid on
+    axis([-inputStreetCellsNumber-3 inputStreetCellsNumber+3 -inputStreetCellsNumber-3 inputStreetCellsNumber+3])
+    westSouthVector = -inputStreetCellsNumber-3:-4;
+    eastNorthVector = flip(4:inputStreetCellsNumber+3);
+    roundValueVector = [flip(-3:-1) -2:0 1:3 flip(0:2)];
+    roundVector = [-2:3 flip(-3:2)];
+    plotStreet(inputStreetCellsNumber)
+    showStreet(inputStreetCellsNumber, westStreet, westStreetColorArray, westSouthVector, zeros(1, inputStreetCellsNumber), i);
+    showStreet(inputStreetCellsNumber, southStreet, southStreetColorArray, zeros(1, inputStreetCellsNumber), westSouthVector,  i);
+    showStreet(inputStreetCellsNumber, eastStreet, eastStreetColorArray, eastNorthVector, zeros(1, inputStreetCellsNumber),  i);
+    showStreet(inputStreetCellsNumber, northStreet, northStreetColorArray, zeros(1, inputStreetCellsNumber), eastNorthVector, i);
+    showStreet(inputStreetCellsNumber, northStreet, northStreetColorArray, zeros(1, inputStreetCellsNumber), eastNorthVector, i);
+    %%%%
+    showStreet(inputStreetCellsNumber, northStreetOut, northStreetColorArrayOut, ones(1, inputStreetCellsNumber), flip(eastNorthVector), i);
+    showStreet(inputStreetCellsNumber, eastStreetOut, eastStreetColorArrayOut, flip(eastNorthVector), -ones(1, inputStreetCellsNumber), i);
+    showStreet(inputStreetCellsNumber, southStreetOut, southStreetColorArrayOut, -ones(1, inputStreetCellsNumber), flip(westSouthVector), i);
+    showStreet(inputStreetCellsNumber, westStreetOut, westStreetColorArrayOut, flip(westSouthVector), ones(1, inputStreetCellsNumber), i);
+
+    showStreet(roundaboutCellsNumber, roundabout, roundaboutColorArray, roundVector, roundValueVector, i);
+    for j=1:roundaboutCellsNumber
+        if roundabout(i, j) ~= -1
+            style = [roundaboutColorArray(i, j) "."];
+            style = join(style);
+            plot(roundVector(j), roundValueVector(j), style, 'MarkerSize', 30)
+            hold on
+        end
+        axis([-inputStreetCellsNumber-3 inputStreetCellsNumber+3 -inputStreetCellsNumber-3 inputStreetCellsNumber+3])
+        grid on
+    end
+    drawnow
+    pause(0.5)
+end
+
+[densityWest] = density(westStreet, timeStepsNumber, inputStreetCellsNumber)
+[densitySouth] = density(southStreet, timeStepsNumber, inputStreetCellsNumber)
+[densityEast] = density(eastStreet, timeStepsNumber, inputStreetCellsNumber)
+[densityNorth] = density(northStreet, timeStepsNumber, inputStreetCellsNumber)
+[densityWestOut] = density(westStreetOut, timeStepsNumber, inputStreetCellsNumber)
+[densitySouthOut] = density(southStreetOut, timeStepsNumber, inputStreetCellsNumber)
+[densityEastOut] = density(eastStreetOut, timeStepsNumber, inputStreetCellsNumber)
+[densityNorthOut] = density(northStreetOut, timeStepsNumber, inputStreetCellsNumber)
+[densityroundabout] = density(roundabout, timeStepsNumber, roundaboutCellsNumber)
+figure
+%in
+stem3(westSouthVector, zeros(1, inputStreetCellsNumber), densityWest)
+hold on
+stem3(zeros(1, inputStreetCellsNumber), westSouthVector, densitySouth)
+stem3(eastNorthVector, zeros(1, inputStreetCellsNumber), densityEast)
+stem3(zeros(1, inputStreetCellsNumber), eastNorthVector, densityNorth)
+%out
+stem3(flip(westSouthVector), ones(1, inputStreetCellsNumber), densityWestOut)
+stem3(-ones(1, inputStreetCellsNumber), flip(westSouthVector), densitySouthOut)
+stem3(flip(eastNorthVector), -ones(1, inputStreetCellsNumber), densityEastOut)
+stem3(ones(1, inputStreetCellsNumber), flip(eastNorthVector), densityNorthOut)
+%round
+stem3(roundVector, roundValueVector, densityroundabout)
+axis([-14 14 -14 14])
+grid on
+
+%%
 % 
 % for i=1:timeStepsNumber
 %     figure
@@ -355,65 +420,3 @@ southStreetOut
 %     end
 %     drawnow
 % end
-
-for i=1:timeStepsNumber
-    figure
-    grid on
-    axis([-13 13 -13 13])
-    plot(-13:13, zeros(1,27), 'k')
-    hold on
-    plot(zeros(1,27), -13:13, 'k')
-    westSouthVector = -inputStreetCellsNumber-3:-4;
-    eastNorthVector = flip(4:inputStreetCellsNumber+3);
-    showStreet(inputStreetCellsNumber, westStreet, westStreetColorArray, westSouthVector, zeros(1, inputStreetCellsNumber), i);
-    showStreet(inputStreetCellsNumber, southStreet, southStreetColorArray, zeros(1, inputStreetCellsNumber), westSouthVector,  i);
-    showStreet(inputStreetCellsNumber, eastStreet, eastStreetColorArray, eastNorthVector, zeros(1, inputStreetCellsNumber),  i);
-    showStreet(inputStreetCellsNumber, northStreet, northStreetColorArray, zeros(1, inputStreetCellsNumber), eastNorthVector, i);
-    showStreet(inputStreetCellsNumber, northStreet, northStreetColorArray, zeros(1, inputStreetCellsNumber), eastNorthVector, i);
-    %%%%
-    showStreet(inputStreetCellsNumber, northStreetOut, northStreetColorArrayOut, ones(1, inputStreetCellsNumber), flip(eastNorthVector), i);
-    showStreet(inputStreetCellsNumber, eastStreetOut, eastStreetColorArrayOut, flip(eastNorthVector), -ones(1, inputStreetCellsNumber), i);
-    showStreet(inputStreetCellsNumber, southStreetOut, southStreetColorArrayOut, -ones(1, inputStreetCellsNumber), flip(westSouthVector), i);
-    showStreet(inputStreetCellsNumber, westStreetOut, westStreetColorArrayOut, flip(westSouthVector), ones(1, inputStreetCellsNumber), i);
-      roundValueVector = [flip(-3:-1) -2:0 1:3 flip(0:2)];
-      roundVector = [-2:3 flip(-3:2)];
-    showStreet(roundaboutCellsNumber, roundabout, roundaboutColorArray, roundVector, roundValueVector, i);
-    for j=1:roundaboutCellsNumber
-        if roundabout(i, j) ~= -1
-            style = [roundaboutColorArray(i, j) "."];
-            style = join(style);
-            plot(roundVector(j), roundValueVector(j), style, 'MarkerSize', 30)
-            hold on
-            axis([-13 13 -13 13])
-            grid on
-        end
-    end
-    drawnow
-    pause(0.5)
-end
-
-[densityWest] = density(westStreet, timeStepsNumber, inputStreetCellsNumber)
-[densitySouth] = density(southStreet, timeStepsNumber, inputStreetCellsNumber)
-[densityEast] = density(eastStreet, timeStepsNumber, inputStreetCellsNumber)
-[densityNorth] = density(northStreet, timeStepsNumber, inputStreetCellsNumber)
-[densityWestOut] = density(westStreetOut, timeStepsNumber, inputStreetCellsNumber)
-[densitySouthOut] = density(southStreetOut, timeStepsNumber, inputStreetCellsNumber)
-[densityEastOut] = density(eastStreetOut, timeStepsNumber, inputStreetCellsNumber)
-[densityNorthOut] = density(northStreetOut, timeStepsNumber, inputStreetCellsNumber)
-[densityroundabout] = density(roundabout, timeStepsNumber, roundaboutCellsNumber)
-figure
-%in
-stem3(westSouthVector, zeros(1, inputStreetCellsNumber), densityWest)
-hold on
-stem3(zeros(1, inputStreetCellsNumber), westSouthVector, densitySouth)
-stem3(eastNorthVector, zeros(1, inputStreetCellsNumber), densityEast)
-stem3(zeros(1, inputStreetCellsNumber), eastNorthVector, densityNorth)
-%out
-stem3(flip(westSouthVector), ones(1, inputStreetCellsNumber), densityWestOut)
-stem3(-ones(1, inputStreetCellsNumber), flip(westSouthVector), densitySouthOut)
-stem3(flip(eastNorthVector), -ones(1, inputStreetCellsNumber), densityEastOut)
-stem3(ones(1, inputStreetCellsNumber), flip(eastNorthVector), densityNorthOut)
-%round
-stem3(roundVector, roundValueVector, densityroundabout)
-axis([-14 14 -14 14])
-grid on

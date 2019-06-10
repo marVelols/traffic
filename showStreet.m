@@ -5,10 +5,10 @@ function [] = showStreet(inputStreetCellsNumber, street, streetColorArray, vecto
             style = [streetColorArray(timeStep, j) "."];
             style = join(style);
             plot(vectorX(j), vectorY(j), style, 'MarkerSize', 30)
-            hold on
-            axis([-14 14 -14 14])
-            grid on
         end
+        hold on
+        axis([-inputStreetCellsNumber-3 inputStreetCellsNumber+3 -inputStreetCellsNumber-3 inputStreetCellsNumber+3])
+        grid on
     end
 end
 

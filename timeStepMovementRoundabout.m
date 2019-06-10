@@ -13,19 +13,19 @@ function [street, streetColorArray, destination, southStreetOut, eastStreetOut, 
                 if cell == 2
                 	southStreetOut(timeStep,1) = 1;
                     startSouthOut = 2;
-                    southStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                    southStreetColorArrayOut(timeStep, 1) = streetColorArray(timeStep-1, cell);
                 elseif cell == 5
                     eastStreetOut(timeStep,1) = 1;
                     startEastOut = 2;
-                    eastStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                    eastStreetColorArrayOut(timeStep, 1) = streetColorArray(timeStep-1, cell);
                 elseif cell == 8
                     northStreetOut(timeStep,1) = 1;
                     startNorthOut = 2;
-                    northStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                    northStreetColorArrayOut(timeStep, 1) = streetColorArray(timeStep-1, cell);
                 elseif cell == 11
                     westStreetOut(timeStep,1) = 1;
                     startWestOut = 2;
-                    westStreetColorArrayOut(timeStep, cell) = streetColorArray(timeStep-1, cell);
+                    westStreetColorArrayOut(timeStep, 1) = streetColorArray(timeStep-1, cell);
                 end                
                 continue;
             end
