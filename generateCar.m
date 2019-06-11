@@ -1,8 +1,9 @@
-function [start, street, streetColorArray, colorIndex] = generateCar(street,timeStep, streetColorArray, colorIndex, colorsArray, prob)
+function [start, street, streetColorArray, colorIndex] = generateCar(street,timeStep, streetColorArray, colorIndex, colorsArray)
     %generate a car
     start = 1;
     % if there is no car in first cell and round(rand) == 1
     ifGenerate = randsrc(1,1,[0,1;1-prob,prob]);
+    %ifGenerate = round(rand);
     if street(timeStep-1, 1) == -1 && ifGenerate
         % generate car with velocity 1-5 for first cell
         velocity = randi([1 5],1,1);
